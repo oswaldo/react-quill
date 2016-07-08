@@ -10,7 +10,10 @@ lazy val playserver = (project in file("play")).settings(
     "com.lihaoyi" %% "scalatags" % "0.5.5",
     "org.webjars" % "jquery" % "3.0.0",
     "com.github.japgolly.scalacss" %% "core" % "0.4.1",
-    "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.4.1"
+    "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.4.1",
+    jdbc, evolutions,
+    "de.leanovate" %% "play-cassandra-evolutions" % "2.5.0",
+    "io.getquill" %% "quill-cassandra" % "0.7.0"
   )
 ).enablePlugins(PlayScala).
   aggregate(clients.map(projectToRef): _*).
