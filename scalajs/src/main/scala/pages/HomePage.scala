@@ -5,20 +5,26 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 
 import scalacss.Defaults._
 import scalacss.ScalaCssReact._
+import org.scalajs.dom.ext.Ajax
+import scala.concurrent.ExecutionContext
 
 object HomePage {
 
-  object Style extends StyleSheet.Inline {
-    import dsl._
-    val content = style(textAlign.center,
-                        fontSize(30.px),
-                        minHeight(450.px),
-                        paddingTop(40.px))
-  }
+  val contentDiv = <.div(
+    ^.id := "home-content",
+    css.Home.content,
+    "react-quill template")
 
   val component = ReactComponentB
-    .static("HomePage", <.div(Style.content, "ScalaJS-React Template "))
+    .static("HomePage", contentDiv)
     .build
 
-  def apply() = component()
+  def apply() = {
+    component()
+    import scala.concurrent.ExecutionContext.Implicits.global
+    Ajax.get("/listTable1").onSuccess {
+      case xhr =>
+        
+    }
+  }
 }
