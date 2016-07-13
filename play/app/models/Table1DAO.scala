@@ -3,15 +3,12 @@ package models
 import java.util.UUID
 import io.getquill._
 import io.getquill.naming.SnakeCase
+import shared.models.Table1
 
-case class Table1(id: UUID, value: String) {
-
-  implicit val encodeUUID = mappedEncoding[UUID, String](_.toString)
-  implicit val decodeUUID = mappedEncoding[String, UUID](UUID.fromString(_))
-
-}
-
-object Table1 {
+object Table1DAO {
+	
+	implicit val encodeUUID = mappedEncoding[UUID, String](_.toString)
+			implicit val decodeUUID = mappedEncoding[String, UUID](UUID.fromString(_))
 
   lazy val db = source(new CassandraSyncSourceConfig[SnakeCase]("cassandra"))
 

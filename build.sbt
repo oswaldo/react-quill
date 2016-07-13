@@ -13,8 +13,7 @@ lazy val playserver = (project in file("play")).settings(
     "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.4.1",
     jdbc, evolutions,
     "de.leanovate" %% "play-cassandra-evolutions" % "2.5.0",
-    "io.getquill" %% "quill-cassandra" % "0.7.0",
-    "com.lihaoyi" %% "upickle" % "0.4.1"
+    "io.getquill" %% "quill-cassandra" % "0.7.0"
   )
 ).enablePlugins(PlayScala).
   aggregate(clients.map(projectToRef): _*).
@@ -32,8 +31,7 @@ lazy val scalajsclient = (project in file("scalajs")).settings(
     "com.github.japgolly.scalajs-react" %%% "extra" % "0.11.1",
     "com.github.japgolly.scalacss" %%% "core" % "0.4.1",
     "com.github.japgolly.scalacss" %%% "ext-scalatags" % "0.4.1",
-    "com.github.japgolly.scalacss" %%% "ext-react" % "0.4.1",
-    "com.lihaoyi" %%% "upickle" % "0.4.1"
+    "com.github.japgolly.scalacss" %%% "ext-react" % "0.4.1"
   ),
   jsDependencies ++= Seq(
     "org.webjars.npm" % "react"     % "0.14.2" / "react-with-addons.js" commonJSName "React"    minified "react-with-addons.min.js",
@@ -53,7 +51,8 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
   jsSettings(
     libraryDependencies ++= Seq(
       "com.lihaoyi" %%% "scalatags" % "0.5.5",
-      "com.lihaoyi" %%% "upickle" % "0.4.1"
+      "com.lihaoyi" %%% "upickle" % "0.4.1",
+      "com.github.japgolly.scalajs-react" %%% "ext-monocle" % "0.11.1"
     )
   ).
   jsConfigure(_ enablePlugins ScalaJSPlay)
