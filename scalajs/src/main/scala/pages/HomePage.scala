@@ -12,26 +12,40 @@ import upickle.default._
 import org.scalajs.dom
 
 object HomePage {
-  
-  case class State(rows: Option[Seq[Table1]])
 
-  val contentDiv = <.div(
-    ^.id := "home-content",
-    css.Home.content,
-    "react-quill template")
+  case class State(rows: Option[Seq[Table1]] = None)
 
-  val component = ReactComponentB
-    .static("HomePage", contentDiv)
+  class Backend(scope: BackendScope[Unit, State]) {
+
+    def loadRows = Callback {
+      import scala.concurrent.ExecutionContext.Implicits.global
+      Ajax.get("/listTable1").onSuccess {
+        case xhr =>
+          val result = read[Seq[Table1]](xhr.responseText)
+          scope.setState(State(Some(result)))
+          dom.window.alert("Hi from Scala-js-dom")
+      }
+    }
+
+    def render(state: State) = state.rows match {
+      case None => <.div(
+        ^.id := "home-content",
+        css.Home.content, "react-quill template")
+
+      case Some(rows) => <.div(
+        ^.id := "home-content",
+        css.Home.content, s"${rows.toString}")
+    }
+
+  }
+
+  val component = ReactComponentB[Unit]("HomePage")
+    .initialState(State())
+    .renderBackend[Backend]
+    .componentDidMount(scope => scope.backend.loadRows)
     .build
 
   def apply(): ReactElement = {
-    import scala.concurrent.ExecutionContext.Implicits.global
-    Ajax.get("/listTable1").onSuccess {
-      case xhr =>
-        var content = read[Seq[Table1]](xhr.responseText)
-//        dom.window.alert("Hi from Scala-js-dom")
-        contentDiv(<.p(content.toString))
-    }
     component()
   }
 }
