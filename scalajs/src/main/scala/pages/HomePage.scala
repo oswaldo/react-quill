@@ -36,6 +36,7 @@ object HomePage {
                 "react-quill template")
 
         case Some(rows) =>
+          //ugly .toString just to prove the concept...
           <.div(^.id := "home-content", css.Home.content, s"${rows.toString}")
       }
     }
