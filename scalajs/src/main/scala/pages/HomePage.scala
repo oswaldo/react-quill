@@ -22,19 +22,26 @@ object HomePage {
       Ajax.get("/listTable1").onSuccess {
         case xhr =>
           val result = read[Seq[Table1]](xhr.responseText)
-          scope.setState(State(Some(result)))
-          dom.window.alert("Hi from Scala-js-dom")
+          //calling runNow because of running inside ajax call
+          scope.modState(_.copy(rows = Some(result))).runNow
       }
     }
 
-    def render(state: State) = state.rows match {
-      case None => <.div(
-        ^.id := "home-content",
-        css.Home.content, "react-quill template")
+    def render(state: State) = {
+      println(s"Rendering $state")
+      state.rows match {
+        case None =>
+          <.div(^.id := "home-content",
+                css.Home.content,
+                "react-quill template")
 
-      case Some(rows) => <.div(
-        ^.id := "home-content",
-        css.Home.content, s"${rows.toString}")
+        case Some(rows) =>
+          <.div(^.id := "home-content", css.Home.content, s"${rows.toString}")
+      }
+    }
+
+    def clear = Callback {
+      //      println("Clear called")
     }
 
   }
@@ -42,7 +49,8 @@ object HomePage {
   val component = ReactComponentB[Unit]("HomePage")
     .initialState(State())
     .renderBackend[Backend]
-    .componentDidMount(scope => scope.backend.loadRows)
+    .componentDidMount(_.backend.loadRows)
+    .componentWillUnmount(_.backend.clear)
     .build
 
   def apply(): ReactElement = {

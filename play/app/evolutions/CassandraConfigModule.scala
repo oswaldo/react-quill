@@ -6,7 +6,8 @@ import play.api.Environment
 import play.api.inject.Module
 
 class CassandraConfigModule extends Module {
-  override def bindings(environment: Environment, configuration: Configuration) = {
+  override def bindings(environment: Environment,
+                        configuration: Configuration) = {
     Seq(bind[CassandraEndpointConfig].to[LocalhostEndpointsConfig])
   }
 }

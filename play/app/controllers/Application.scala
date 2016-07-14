@@ -15,7 +15,7 @@ import models.Table1DAO
 import java.util.UUID
 import upickle.default._
 
-class Application @Inject() (implicit env: play.Environment)
+class Application @Inject()(implicit env: play.Environment)
     extends Controller {
 
   def listTable1 = Action {
