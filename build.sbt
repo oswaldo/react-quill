@@ -26,18 +26,19 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
     scalaVersion := scalaV,
     
     //added resolvers because of silhouette
-    resolvers ++= Seq(
-      "Atlassian Releases" at "https://maven.atlassian.com/public/",
-      "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-      "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
-    )
+    resolvers += Resolver.jcenterRepo
+    //resolvers ++= Seq(
+    //  "Atlassian Releases" at "https://maven.atlassian.com/public/",
+    //  "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
+    //  "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+    //)
     
   ).
   jvmSettings(
     libraryDependencies ++= Seq(
       specs2 % Test,
       "org.webjars" % "jquery" % "3.0.0",
-      jdbc, evolutions,
+      jdbc, evolutions, cache, filters,
       "de.leanovate" %% "play-cassandra-evolutions" % "2.5.0",
       "io.getquill" %% "quill-cassandra" % "0.7.0",
       "com.lihaoyi" %% "scalatags" % "0.5.5",
@@ -48,7 +49,9 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
       "com.mohiva" %% "play-silhouette-password-bcrypt" % "4.0.0-RC1",
       "com.mohiva" %% "play-silhouette-persistence" % "4.0.0-RC1",
       "com.mohiva" %% "play-silhouette-crypto-jca" % "4.0.0-RC1",
-      "com.mohiva" %% "play-silhouette-testkit" % "4.0.0-RC1" % "test"
+      "com.mohiva" %% "play-silhouette-testkit" % "4.0.0-RC1" % "test",
+      "net.codingwell" %% "scala-guice" % "4.0.1",
+      "com.iheart" %% "ficus" % "1.2.6"
     )
   ).
   jsSettings(

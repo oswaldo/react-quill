@@ -1,4 +1,4 @@
-package models
+package models.daos
 
 import java.util.UUID
 import io.getquill._

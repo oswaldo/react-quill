@@ -11,11 +11,16 @@ import scalatags.Text.all._
 import shared.SharedMessages
 import javax.inject.Inject
 import views.MainView
-import models.Table1DAO
+import models.daos.Table1DAO
 import java.util.UUID
 import upickle.default._
+import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
+import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
+import utils.auth.DefaultEnv
 
-class Application @Inject()(implicit env: play.Environment)
+class Application @Inject()(silhouette: Silhouette[DefaultEnv],
+                            socialProviderRegistry: SocialProviderRegistry,
+                            implicit val env: play.Environment)
     extends Controller {
 
   def listTable1 = Action {
