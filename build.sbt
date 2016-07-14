@@ -5,7 +5,10 @@ lazy val scalaV = "2.11.8"
 
 lazy val playserver = (project in file("play")).settings(
   scalaVersion := scalaV,
-  scalaJSProjects := clients
+  scalaJSProjects := clients,
+  libraryDependencies ++= Seq(
+    specs2 % Test
+  )
 ).enablePlugins(PlayScala).
   aggregate(clients.map(projectToRef): _*).
   dependsOn(sharedJvm)
@@ -22,6 +25,7 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
   settings(scalaVersion := scalaV).
   jvmSettings(
     libraryDependencies ++= Seq(
+      specs2 % Test,
       "org.webjars" % "jquery" % "3.0.0",
       jdbc, evolutions,
       "de.leanovate" %% "play-cassandra-evolutions" % "2.5.0",
@@ -34,7 +38,7 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
   ).
   jsSettings(
     libraryDependencies ++= Seq(
-    "org.scala-js" %%% "scalajs-dom" % "0.8.2",
+      "org.scala-js" %%% "scalajs-dom" % "0.8.2",
       "com.lihaoyi" %%% "scalatags" % "0.5.5",
       "com.lihaoyi" %%% "upickle" % "0.4.1",
       "com.github.japgolly.scalajs-react" %%% "core" % "0.11.1",
