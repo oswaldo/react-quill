@@ -22,7 +22,17 @@ lazy val scalajsclient = (project in file("scalajs")).settings(
   dependsOn(sharedJs)
 
 lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
-  settings(scalaVersion := scalaV).
+  settings(
+    scalaVersion := scalaV,
+    
+    //added resolvers because of silhouette
+    resolvers ++= Seq(
+      "Atlassian Releases" at "https://maven.atlassian.com/public/",
+      "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
+      "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+    )
+    
+  ).
   jvmSettings(
     libraryDependencies ++= Seq(
       specs2 % Test,
@@ -33,7 +43,12 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
       "com.lihaoyi" %% "scalatags" % "0.5.5",
       "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.4.1",
       "com.github.japgolly.scalacss" %% "core" % "0.4.1",
-      "com.lihaoyi" %% "upickle" % "0.4.1"
+      "com.lihaoyi" %% "upickle" % "0.4.1",
+      "com.mohiva" %% "play-silhouette" % "4.0.0-RC1",
+      "com.mohiva" %% "play-silhouette-password-bcrypt" % "4.0.0-RC1",
+      "com.mohiva" %% "play-silhouette-persistence" % "4.0.0-RC1",
+      "com.mohiva" %% "play-silhouette-crypto-jca" % "4.0.0-RC1",
+      "com.mohiva" %% "play-silhouette-testkit" % "4.0.0-RC1" % "test"
     )
   ).
   jsSettings(
