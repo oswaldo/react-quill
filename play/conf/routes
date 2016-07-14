@@ -10,3 +10,10 @@ GET     /react-scalajs-scalatags/   @controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET     /listTable1                 @controllers.Application.listTable1
+
+GET     /user                       controllers.Application.user
+GET     /signOut                    controllers.Application.signOut
+POST    /signIn                     controllers.SignInController.submit
+POST    /signUp                     controllers.SignUpController.submit
+GET     /authenticate/:provider     controllers.SocialAuthController.authenticate(provider)
+POST    /authenticate/:provider     controllers.SocialAuthController.authenticate(provider)
