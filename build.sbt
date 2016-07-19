@@ -7,7 +7,8 @@ lazy val playserver = (project in file("play")).settings(
   scalaVersion := scalaV,
   scalaJSProjects := clients,
   libraryDependencies ++= Seq(
-    specs2 % Test
+    specs2 % Test,
+    "com.unboundid" % "unboundid-ldapsdk" % "3.1.1"
   )
 ).enablePlugins(PlayScala).
   aggregate(clients.map(projectToRef): _*).

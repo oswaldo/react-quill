@@ -1,15 +1,14 @@
 package models.services
 
-import java.util.UUID
-import javax.inject.Inject
+import scala.concurrent.Future
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
+
+import javax.inject.Inject
 import models.User
 import models.daos.UserDAO
-import play.api.libs.concurrent.Execution.Implicits._
-
-import scala.concurrent.Future
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 /**
  * Handles actions to users.
@@ -46,22 +45,19 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
     userDAO.find(profile.loginInfo).flatMap {
       case Some(user) => // Update user with profile
         userDAO.save(user.copy(
+          email = profile.email.get,
           firstName = profile.firstName,
           lastName = profile.lastName,
           fullName = profile.fullName,
-          email = profile.email,
-          avatarURL = profile.avatarURL
-        ))
+          avatarURL = profile.avatarURL))
       case None => // Insert a new user
         userDAO.save(User(
-          userID = UUID.randomUUID(),
+          email = profile.email.get,
           loginInfo = profile.loginInfo,
           firstName = profile.firstName,
           lastName = profile.lastName,
           fullName = profile.fullName,
-          email = profile.email,
-          avatarURL = profile.avatarURL
-        ))
+          avatarURL = profile.avatarURL))
     }
   }
 }

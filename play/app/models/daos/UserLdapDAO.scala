@@ -4,15 +4,16 @@ import java.util.UUID
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import models.User
-import models.daos.UserMockDAO._
 
 import scala.collection.mutable
 import scala.concurrent.Future
+import utils.auth.LdapFacade
+import javax.inject.Inject
 
 /**
  * Give access to the user object.
  */
-class UserMockDAO extends UserDAO {
+class UserLdapDAO @Inject() (ldap: LdapFacade) extends UserDAO {
 
   /**
    * Finds a user by its login info.
@@ -21,7 +22,7 @@ class UserMockDAO extends UserDAO {
    * @return The found user or None if no user for the given login info could be found.
    */
   def find(loginInfo: LoginInfo) = {
-    Future.successful(users.find { case (id, user) => user.loginInfo == loginInfo }.map(_._2))
+    find(loginInfo.providerKey)
   }
 
   /**
@@ -31,7 +32,7 @@ class UserMockDAO extends UserDAO {
    * @return The found user or None if no user for the given email could be found.
    */
   def find(email: String) = {
-    Future.successful(users.get(email))
+    Future.successful(ldap.findByEmail(email))
   }
 
   /**
@@ -41,18 +42,6 @@ class UserMockDAO extends UserDAO {
    * @return The saved user.
    */
   def save(user: User) = {
-    users += (user.email -> user)
-    Future.successful(user)
+    ???
   }
-}
-
-/**
- * The companion object.
- */
-object UserMockDAO {
-
-  /**
-   * The list of users.
-   */
-  val users: mutable.HashMap[String, User] = mutable.HashMap()
 }

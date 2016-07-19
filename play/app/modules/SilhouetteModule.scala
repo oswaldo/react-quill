@@ -30,6 +30,9 @@ import play.api.Configuration
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.ws.WSClient
 import utils.auth.DefaultEnv
+import utils.auth.LdapFacade
+import utils.auth.LdapFacadeImpl
+import com.google.inject.Scopes
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -40,7 +43,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * Configures the module.
    */
   def configure() {
-    bind[UserDAO].to[UserMockDAO]
+    bind[LdapFacade].to[LdapFacadeImpl].in(Scopes.SINGLETON)
+    bind[UserDAO].to[UserLdapDAO]
     bind[UserService].to[UserServiceImpl]
     bind[Silhouette[DefaultEnv]].to[SilhouetteProvider[DefaultEnv]]
     bind[CacheLayer].to[PlayCacheLayer]
@@ -51,10 +55,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       new DefaultFingerprintGenerator(false))
     bind[EventBus].toInstance(EventBus())
     bind[Clock].toInstance(Clock())
+    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoLdapDAO]
 
     // Replace this with the bindings to your concrete DAOs
-    bind[DelegableAuthInfoDAO[PasswordInfo]]
-      .toInstance(new InMemoryAuthInfoDAO[PasswordInfo])
     bind[DelegableAuthInfoDAO[OAuth1Info]]
       .toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
     bind[DelegableAuthInfoDAO[OAuth2Info]]

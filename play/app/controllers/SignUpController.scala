@@ -22,7 +22,6 @@ import scala.concurrent.Future
 import org.slf4j.LoggerFactory
 import ch.qos.logback.core.util.StatusPrinter
 import ch.qos.logback.classic.LoggerContext
-import SignUpController._
 
 /**
  * The `Sign Up` controller.
@@ -41,7 +40,9 @@ class SignUpController @Inject() (
   authInfoRepository: AuthInfoRepository,
   avatarService: AvatarService,
   passwordHasher: PasswordHasher)
-    extends Controller with I18nSupport {
+    extends Controller
+    with I18nSupport
+    with Logger {
 
   /**
    * Handles the submitted JSON data.
@@ -59,12 +60,11 @@ class SignUpController @Inject() (
       case None =>
         val authInfo = passwordHasher.hash(data.password)
         val user = User(
-          userID = UUID.randomUUID(),
+          email = data.email,
           loginInfo = loginInfo,
           firstName = Some(data.firstName),
           lastName = Some(data.lastName),
           fullName = Some(data.firstName + " " + data.lastName),
-          email = Some(data.email),
           avatarURL = None)
         for {
           avatar <- avatarService.retrieveURL(data.email)
@@ -83,8 +83,4 @@ class SignUpController @Inject() (
     //        Future.successful(Unauthorized(Json.obj("message" -> Messages("invalid.data"))))
     //    }
   }
-}
-
-object SignUpController {
-    def logger = LoggerFactory.getLogger(classOf[SignUpController])
 }

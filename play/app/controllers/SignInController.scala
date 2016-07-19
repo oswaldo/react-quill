@@ -18,16 +18,17 @@ import play.api.libs.functional.syntax._
 import upickle.default._
 import play.api.mvc.{ Action, Controller }
 import utils.auth.DefaultEnv
+import utils.auth.LdapFacade
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
+import models.User
 import shared.models.SignInData
 
 import org.slf4j.LoggerFactory
 import ch.qos.logback.core.util.StatusPrinter
 import ch.qos.logback.classic.LoggerContext
-import SignInController._
 
 /**
  * The `Sign In` controller.
@@ -49,8 +50,11 @@ class SignInController @Inject() (
   credentialsProvider: CredentialsProvider,
   socialProviderRegistry: SocialProviderRegistry,
   configuration: Configuration,
-  clock: Clock)
-    extends Controller with I18nSupport {
+  clock: Clock,
+  ldap: LdapFacade)
+    extends Controller
+    with I18nSupport
+    with Logger {
 
   /**
    * Handles the submitted JSON data.
@@ -59,7 +63,6 @@ class SignInController @Inject() (
    */
   def submit = Action.async(parse.json) { implicit request =>
     //    request.body.validate[SignInData].map { data =>
-    logger.debug(request.body.toString)
     val data = read[SignInData](request.body.toString)
     credentialsProvider.authenticate(Credentials(data.email, data.password)).flatMap { loginInfo =>
       userService.retrieve(loginInfo).flatMap {
@@ -71,7 +74,7 @@ class SignInController @Inject() (
               idleTimeout = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout"))
           case authenticator => authenticator
         }.flatMap { authenticator =>
-          silhouette.env.eventBus.publish(LoginEvent(user, request))
+          silhouette.env.eventBus.publish(LoginEvent(ldap.findByEmail(data.email).get, request))
           silhouette.env.authenticatorService.init(authenticator).map { token =>
             Ok(write("token" -> token))
           }
@@ -80,6 +83,7 @@ class SignInController @Inject() (
       }
     }.recover {
       case e: ProviderException =>
+        logger.trace("ProviderException", e)
         Unauthorized(write("message" -> Messages("invalid.credentials")))
     }
     //    }.recoverTotal {
@@ -87,8 +91,4 @@ class SignInController @Inject() (
     //        Future.successful(Unauthorized(write("message" -> Messages("invalid.credentials"))))
     //    }
   }
-}
-
-object SignInController {
-    def logger = LoggerFactory.getLogger(classOf[SignInController])
 }
