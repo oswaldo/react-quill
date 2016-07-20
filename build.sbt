@@ -18,7 +18,10 @@ lazy val scalajsclient = (project in file("scalajs")).settings(
   scalaVersion := scalaV,
   persistLauncher := true,
   persistLauncher in Test := false,
-  unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value)
+  unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value),
+  libraryDependencies ++= Seq(
+    "com.github.chandu0101.scalajs-react-components" %%% "core" % "0.4.1"
+  )
 ).enablePlugins(ScalaJSPlugin, ScalaJSPlay).
   dependsOn(sharedJs)
 
