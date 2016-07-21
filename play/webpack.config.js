@@ -17,7 +17,8 @@ module.exports = {
         react_slick: './bundles/react-slick.js'
     },
     output: {
-        path: __dirname + '/assets',
+        //path: __dirname + '/assets',
+        path: __dirname + '/target/web/public/main',
         publicPath: "/assets/",
         filename: '[name]-bundle.js'
     },
