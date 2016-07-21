@@ -7,5 +7,7 @@ injectTapEventPlugin();
 window.hljs = require("highlight.js");
 require("highlight.js/styles/github.css");
 
+window.mui = require("material-ui");
+
 //images
 //window.someImage      = require("../images/some.png");
