@@ -17,12 +17,16 @@ object MainView {
   def scripts(projectName: String)(implicit env: play.Environment) =
     Seq(projectScript(projectName, { if (env.isProd) "opt" else "fastopt" }),
         projectScript(projectName, "jsdeps"),
-        projectScript(projectName, "launcher"))
+        projectScript(projectName, "launcher"),
+        someScript("index-bundle"))
 
   def projectScript(projectName: String,
                     discriminator: String): TypedTag[String] = {
-    script(src := s"/assets/${projectName.toLowerCase}-$discriminator.js",
-           `type` := "text/javascript")
+    val scriptName = s"${projectName.toLowerCase}-$discriminator"
+    someScript(scriptName)
   }
+
+  def someScript(scriptName: String) =
+    script(src := s"/assets/$scriptName.js", `type` := "text/javascript")
 
 }

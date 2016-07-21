@@ -9,8 +9,10 @@ lazy val playserver = (project in file("play")).settings(
   libraryDependencies ++= Seq(
     specs2 % Test,
     "com.unboundid" % "unboundid-ldapsdk" % "3.1.1"
-  )
-).enablePlugins(PlayScala).
+  ),
+  pipelineStages := Seq(webpack),
+  webpack <<= webpack dependsOn(JsEngineKeys.npmNodeModules in Assets)
+).enablePlugins(PlayScala, SbtWeb).
   aggregate(clients.map(projectToRef): _*).
   dependsOn(sharedJvm)
 
@@ -71,9 +73,15 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
       "com.github.japgolly.scalacss" %%% "ext-react" % "0.4.1"
     ),
     jsDependencies ++= Seq(
-      "org.webjars.npm" % "react"     % "0.14.2" / "react-with-addons.js" commonJSName "React"    minified "react-with-addons.min.js",
-      "org.webjars.npm" % "react-dom" % "0.14.2" / "react-dom.js"         commonJSName "ReactDOM" minified "react-dom.min.js" dependsOn "react-with-addons.js"
-    )
+    
+      "org.webjars.npm" % "react"     % "0.14.4" / "react-with-addons.js"
+        commonJSName "React"    minified "react-with-addons.min.js",
+        
+      "org.webjars.npm" % "react-dom" % "0.14.4" / "react-dom.js"
+        commonJSName "ReactDOM" minified "react-dom.min.js" dependsOn "react-with-addons.js"
+ 
+    ),
+    skip in packageJSDependencies := false
   ).
   jsConfigure(_ enablePlugins ScalaJSPlay)
 

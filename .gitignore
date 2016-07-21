@@ -1,3 +1,4 @@
+node_modules/
 libexec/
 .sbtserver*
 .cache-main

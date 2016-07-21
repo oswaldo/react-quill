@@ -14,14 +14,14 @@ import views.MainView
 import models.daos.Table1DAO
 import java.util.UUID
 import upickle.default._
-import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
+import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import utils.auth.DefaultEnv
 import scala.concurrent.Future
 
-class Application @Inject() (silhouette: Silhouette[DefaultEnv],
-  socialProviderRegistry: SocialProviderRegistry,
-  implicit val env: play.Environment)
+class Application @Inject()(silhouette: Silhouette[DefaultEnv],
+                            socialProviderRegistry: SocialProviderRegistry,
+                            implicit val env: play.Environment)
     extends Controller {
 
   def listTable1 = Action {
@@ -37,17 +37,17 @@ class Application @Inject() (silhouette: Silhouette[DefaultEnv],
   }
 
   /**
-   * Returns the user.
-   *
-   * @return The result to display.
-   */
+    * Returns the user.
+    *
+    * @return The result to display.
+    */
   def user = silhouette.SecuredAction.async { implicit request =>
     Future.successful(Ok(write(request.identity)))
   }
 
   /**
-   * Manages the sign out action.
-   */
+    * Manages the sign out action.
+    */
   def signOut = silhouette.SecuredAction.async { implicit request =>
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
     silhouette.env.authenticatorService.discard(request.authenticator, Ok)

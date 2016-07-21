@@ -19,8 +19,9 @@ import com.unboundid.ldap.sdk.Filter
 import com.unboundid.ldap.sdk.DereferencePolicy
 
 @Singleton
-class LdapFacadeImpl @Inject() (lifecycle: ApplicationLifecycle)
-    extends LdapFacade with Logger {
+class LdapFacadeImpl @Inject()(lifecycle: ApplicationLifecycle)
+    extends LdapFacade
+    with Logger {
 
   val domainName = "example"
 
@@ -33,13 +34,18 @@ class LdapFacadeImpl @Inject() (lifecycle: ApplicationLifecycle)
   @volatile private var server = {
     val config = new InMemoryDirectoryServerConfig(s"$nameDc,$extensionDc")
 
-    config.addAdditionalBindCredentials(s"cn=admin@$domainName.$domainExtension", "password")
-    config.setListenerConfigs(InMemoryListenerConfig.createLDAPConfig("default", 2389))
+    config.addAdditionalBindCredentials(
+        s"cn=admin@$domainName.$domainExtension",
+        "password")
+    config.setListenerConfigs(
+        InMemoryListenerConfig.createLDAPConfig("default", 2389))
     config.setSchema(null)
 
     val server = new InMemoryDirectoryServer(config)
     logger.debug(this.getClass.getResource("/ldap/sample.ldif").getPath)
-    server.importFromLDIF(true, new LDIFReader(this.getClass.getResourceAsStream("/ldap/sample.ldif")))
+    server.importFromLDIF(
+        true,
+        new LDIFReader(this.getClass.getResourceAsStream("/ldap/sample.ldif")))
     server.startListening
 
     server
@@ -66,22 +72,34 @@ class LdapFacadeImpl @Inject() (lifecycle: ApplicationLifecycle)
     entry.map(e => User(email, LoginInfo("ldap", email)))
   }
 
-  def passByEmail(email: String): Option[String] = entryByEmail(email, "userpassword").map { entry =>
-    entry.getAttributeValue("userpassword")
-  }
+  def passByEmail(email: String): Option[String] =
+    entryByEmail(email, "userpassword").map { entry =>
+      entry.getAttributeValue("userpassword")
+    }
 
-  def entryByEmail(email: String, attributes: String*): Option[SearchResultEntry] = {
+  def entryByEmail(email: String,
+                   attributes: String*): Option[SearchResultEntry] = {
     val conn = server.getConnection
     val entries = {
       val queryDn = s"ou=Users,$nameDc,$extensionDc"
       val attributeFilter = Filter.createEqualityFilter("mail", email)
-      conn.search(queryDn, SearchScope.ONE, DereferencePolicy.NEVER, 1, 0, false, attributeFilter, attributes: _*)
+      conn.search(queryDn,
+                  SearchScope.ONE,
+                  DereferencePolicy.NEVER,
+                  1,
+                  0,
+                  false,
+                  attributeFilter,
+                  attributes: _*)
     }
-    val result = if (entries == null || entries.getEntryCount == 0) None else {
-      assert(entries.getEntryCount == 1)
-      Some(entries.getSearchEntries.get(0))
-    }
-    logger.trace(result.map(e => s"Found $e").getOrElse(s"Email $email not found"))
+    val result =
+      if (entries == null || entries.getEntryCount == 0) None
+      else {
+        assert(entries.getEntryCount == 1)
+        Some(entries.getSearchEntries.get(0))
+      }
+    logger.trace(
+        result.map(e => s"Found $e").getOrElse(s"Email $email not found"))
     conn.close
     result
   }

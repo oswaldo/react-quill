@@ -19,26 +19,33 @@ import scala.scalajs.js
 
 object HomePage {
 
-  case class State(rows: Option[Seq[Table1]] = None, loginVisible: Boolean = true)
+  case class State(rows: Option[Seq[Table1]] = None,
+                   loginVisible: Boolean = false)
 
   class Backend(scope: BackendScope[Unit, State]) {
 
-    val toggleLogin = scope.modState(state => state.copy(loginVisible = !state.loginVisible))
-    
-    def loginModal(state: State) = {
-      val actions: ReactNode = js.Array(
-        MuiFlatButton(key = "1", label = "Login", secondary = true, onTouchTap = handleLogin)()
-      )
-      <.div(
-        MuiDialog(
-          title = "Dialog With Actions",
-          actions = actions,
-          open = state.loginVisible,
-          onRequestClose = CallbackDebug.f1("onRequestClose")
-        )(
-          "Dialog example with floating buttons"
-        )
-      )
+    val toggleLogin =
+      scope.modState(state => state.copy(loginVisible = !state.loginVisible))
+
+    def renderLogin(state: State) = {
+      println("preactions")
+      val actions = js.Array(
+          MuiFlatButton(key = "1",
+                        label = "Login",
+                        secondary = true,
+                        onTouchTap = handleLogin)())
+      println("actions")
+      val component = <.div(^.id := "home-content",
+                            css.Home.content,
+                            MuiDialog(title = "Dialog With Actions",
+                                      actions = actions,
+                                      open = state.loginVisible,
+                                      onRequestClose =
+                                        CallbackDebug.f1("onRequestClose"))(
+                                "Dialog example with floating buttons"),
+                            "react-quill template")
+      println(s"component to render: $component")
+      component
     }
 
     def doLogin = "/signIn" getAnd { responseText: String =>
@@ -51,7 +58,8 @@ object HomePage {
         Callback.info("Login Clicked")
       }
 
-    def loadRows = Callback {
+    def init = Callback {
+      toggleLogin.runNow
       "/listTable1" getAndRun { responseText: String =>
         val result = read[Seq[Table1]](responseText)
         //no need to call runNow because it is called by getAndRun
@@ -59,17 +67,27 @@ object HomePage {
       }
     }
 
-    def render(state: State) = {
+    def render(state: State): ReactElement = {
       println(s"Rendering $state")
-      state.rows match {
-        case None =>
-          <.div(^.id := "home-content",
-            css.Home.content,
-            "react-quill template")
+      if (state.loginVisible) {
+        println("Should display login")
+        val component = renderLogin(state)
+        println(s"component: $component")
+        component
+      } else {
+        val compoment = state.rows match {
+          case None =>
+            <.div(^.id := "home-content",
+                  css.Home.content,
+                  "react-quill template")
 
-        case Some(rows) =>
-          //ugly .toString just to prove the concept...
-          <.div(^.id := "home-content", css.Home.content, s"${rows.toString}")
+          case Some(rows) =>
+            //ugly .toString just to prove the concept...
+            <.div(^.id := "home-content",
+                  css.Home.content,
+                  s"${rows.toString}")
+        }
+        compoment
       }
     }
 
@@ -82,7 +100,7 @@ object HomePage {
   val component = ReactComponentB[Unit]("HomePage")
     .initialState(State())
     .renderBackend[Backend]
-    .componentDidMount(_.backend.loadRows)
+    .componentDidMount(_.backend.init)
     .componentWillUnmount(_.backend.clear)
     .build
 
