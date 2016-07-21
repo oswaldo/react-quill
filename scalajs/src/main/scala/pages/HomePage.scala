@@ -28,13 +28,11 @@ object HomePage {
       scope.modState(state => state.copy(loginVisible = !state.loginVisible))
 
     def renderLogin(state: State) = {
-      println("preactions")
       val actions = js.Array(
           MuiFlatButton(key = "1",
                         label = "Login",
                         secondary = true,
                         onTouchTap = handleLogin)())
-      println("actions")
       val component = <.div(^.id := "home-content",
                             css.Home.content,
                             MuiDialog(title = "Dialog With Actions",
@@ -44,12 +42,11 @@ object HomePage {
                                         CallbackDebug.f1("onRequestClose"))(
                                 "Dialog example with floating buttons"),
                             "react-quill template")
-      println(s"component to render: $component")
       component
     }
 
-    def doLogin = "/signIn" getAnd { responseText: String =>
-      println(s"responseText: $responseText")
+    def doLogin = "/signIn" postAndRun { responseText: String =>
+      Callback.log(s"responseText: $responseText")
     }
 
     def handleLogin: ReactEventH => Callback =
@@ -68,14 +65,11 @@ object HomePage {
     }
 
     def render(state: State): ReactElement = {
-      println(s"Rendering $state")
       if (state.loginVisible) {
-        println("Should display login")
         val component = renderLogin(state)
-        println(s"component: $component")
         component
       } else {
-        val compoment = state.rows match {
+        val component = state.rows match {
           case None =>
             <.div(^.id := "home-content",
                   css.Home.content,
@@ -87,13 +81,11 @@ object HomePage {
                   css.Home.content,
                   s"${rows.toString}")
         }
-        compoment
+        component
       }
     }
 
-    def clear = Callback {
-      //      println("Clear called")
-    }
+    def clear = Callback.log("Clear called")
 
   }
 
