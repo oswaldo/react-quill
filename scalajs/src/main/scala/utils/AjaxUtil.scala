@@ -30,7 +30,8 @@ object AjaxUtil {
              data: Option[Ajax.InputData] = None,
              callback: Option[(String) => _] = None,
              timeout: Int = 0,
-             headers: Map[String, String] = Map("Content-Type" -> "application/json"),
+             headers: Map[String, String] = Map(
+                 "Content-Type" -> "application/json"),
              withCredentials: Boolean = false,
              responseType: String = ""): Unit = {
 

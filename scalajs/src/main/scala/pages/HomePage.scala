@@ -17,15 +17,37 @@ import chandu0101.scalajs.react.components.materialui._
 import chandu0101.scalajs.react.components.Implicits._
 import scala.scalajs.js
 
+import shared.models.SignInData
+
 object HomePage {
 
   case class State(rows: Option[Seq[Table1]] = None,
-                   loginVisible: Boolean = false)
+                   loginVisible: Boolean = false,
+                   signIn: SignInData = SignInData("", "", false))
 
   class Backend(scope: BackendScope[Unit, State]) {
 
     val toggleLogin =
       scope.modState(state => state.copy(loginVisible = !state.loginVisible))
+
+    def onEmailChange(e: ReactEventI) = {
+      val newValue = e.target.value
+      scope.modState(state =>
+            state.copy(signIn = state.signIn.copy(email = newValue)))
+    }
+
+    def onPasswordChange(e: ReactEventI) = {
+      val newValue = e.target.value
+      scope.modState(state =>
+            state.copy(signIn = state.signIn.copy(password = newValue)))
+    }
+
+    def onRememberMe(e: ReactEventI) = {
+      scope.modState(
+          state =>
+            state.copy(signIn =
+                  state.signIn.copy(rememberMe = !state.signIn.rememberMe)))
+    }
 
     def renderLogin(state: State) = {
       val actions = js.Array(
@@ -33,26 +55,38 @@ object HomePage {
                         label = "Login",
                         secondary = true,
                         onTouchTap = handleLogin)())
-      val component = <.div(^.id := "home-content",
-                            css.Home.content,
-                            MuiDialog(title = "Dialog With Actions",
-                                      actions = actions,
-                                      open = state.loginVisible,
-                                      onRequestClose =
-                                        CallbackDebug.f1("onRequestClose"))(
-                                "Dialog example with floating buttons"),
-                            "react-quill template")
+      val component = <.div(
+          css.Home.content,
+          MuiDialog(title = "Login",
+                    actions = actions,
+                    open = state.loginVisible)(
+              <.form(<.input.text(^.placeholder := "email",
+                                  ^.value := state.signIn.email,
+                                  ^.onChange ==> onEmailChange),
+                     <.br,
+                     <.input.password(^.placeholder := "password",
+                                      ^.value := state.signIn.password,
+                                      ^.onChange ==> onPasswordChange),
+                     <.br,
+                     <.input.checkbox(^.onClick ==> onRememberMe),
+                     "Remember me")
+          ),
+          "react-quill template")
       component
     }
 
-    def doLogin = "/signIn" postAndRun { responseText: String =>
-      Callback.log(s"responseText: $responseText")
+    def doLogin = {
+      val signIn = scope.state.runNow.signIn
+      Callback.log(s"signIn: $signIn")
+      "/signIn".withData(write(signIn)) postAndRun { responseText: String =>
+        Callback.log(s"responseText: $responseText")
+      }
     }
 
     def handleLogin: ReactEventH => Callback =
       e => {
         doLogin
-        Callback.info("Login Clicked")
+        Callback.log(scope.state.runNow.toString)
       }
 
     def init = Callback {
