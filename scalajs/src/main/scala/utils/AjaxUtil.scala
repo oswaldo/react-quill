@@ -9,7 +9,11 @@ import org.scalajs.dom.raw.XMLHttpRequest
 import japgolly.scalajs.react.Callback
 
 object AjaxUtil {
-
+  
+  private var token : Map[String, String] = Map.empty
+  
+  def setToken(t: String) = token = Map("Csrf-Token" -> t)
+  
   def get(url: String,
           data: Option[Ajax.InputData] = None,
           callback: Option[(String) => _] = None): Unit = {
@@ -30,7 +34,7 @@ object AjaxUtil {
              data: Option[Ajax.InputData] = None,
              callback: Option[(String) => _] = None,
              timeout: Int = 0,
-             headers: Map[String, String] = Map(
+             headers: Map[String, String] = token ++ Map(
                  "Content-Type" -> "application/json"),
              withCredentials: Boolean = false,
              responseType: String = ""): Unit = {

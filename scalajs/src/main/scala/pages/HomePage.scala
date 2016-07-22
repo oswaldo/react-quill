@@ -76,10 +76,11 @@ object HomePage {
     }
 
     def doLogin = {
-      val signIn = scope.state.runNow.signIn
-      Callback.log(s"signIn: $signIn")
-      "/signIn".withData(write(signIn)) postAndRun { responseText: String =>
-        Callback.log(s"responseText: $responseText")
+      val state = scope.state.runNow
+      "/signIn".withData(write(state.signIn)) postAndRun { responseText: String =>
+        val token = read[(String,String)](responseText)._2
+        AjaxUtil.setToken(token)
+        scope.modState(_.copy(loginVisible = false))
       }
     }
 
