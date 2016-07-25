@@ -14,6 +14,10 @@ object AjaxUtil {
   
   def setToken(t: String) = token = Map("Csrf-Token" -> t)
   
+  def hasToken = !token.isEmpty
+  
+  def clearToken = token = Map.empty
+  
   def get(url: String,
           data: Option[Ajax.InputData] = None,
           callback: Option[(String) => _] = None): Unit = {

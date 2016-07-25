@@ -22,7 +22,7 @@ import shared.models.SignInData
 object HomePage {
 
   case class State(rows: Option[Seq[Table1]] = None,
-                   loginVisible: Boolean = false,
+                   loginVisible: Boolean = true,
                    signIn: SignInData = SignInData("", "", false))
 
   class Backend(scope: BackendScope[Unit, State]) {
@@ -91,7 +91,10 @@ object HomePage {
       }
 
     def init = Callback {
-      toggleLogin.runNow
+      if (AjaxUtil.hasToken) loadList
+    }
+    
+    def loadList = {
       "/listTable1" getAndRun { responseText: String =>
         val result = read[Seq[Table1]](responseText)
         //no need to call runNow because it is called by getAndRun
@@ -125,7 +128,7 @@ object HomePage {
   }
 
   val component = ReactComponentB[Unit]("HomePage")
-    .initialState(State())
+    .initialState(State(loginVisible = !AjaxUtil.hasToken))
     .renderBackend[Backend]
     .componentDidMount(_.backend.init)
     .componentWillUnmount(_.backend.clear)

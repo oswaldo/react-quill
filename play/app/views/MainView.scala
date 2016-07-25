@@ -15,16 +15,28 @@ object MainView {
   }
 
   def scripts(projectName: String)(implicit env: play.Environment) =
-    Seq(projectScript(projectName, { if (env.isProd) "opt" else "fastopt" }),
-        projectScript(projectName, "jsdeps"),
-        projectScript(projectName, "launcher"),
-        someScript("index-bundle"))
+    Seq(bundle("index"),
+        projectScript(projectName, { if (env.isProd) "opt" else "fastopt" }),
+//        projectScript(projectName, "jsdeps"),
+        projectScript(projectName, "launcher")
+//        ,
+//        bundle("react_geom_icons"),
+//        bundle("react_infinite"),
+//        bundle("react_select"),
+//        bundle("react_slick"),
+//        bundle("react_spinner"),
+//        bundle("react_tags_input"),
+//        bundle("elemental_ui"),
+//        bundle("material_ui")
+        )
 
   def projectScript(projectName: String,
                     discriminator: String): TypedTag[String] = {
     val scriptName = s"${projectName.toLowerCase}-$discriminator"
     someScript(scriptName)
   }
+  
+  def bundle(bundlePrefix: String) = someScript(s"$bundlePrefix-bundle")
 
   def someScript(scriptName: String) =
     script(src := s"/assets/$scriptName.js", `type` := "text/javascript")
