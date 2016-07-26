@@ -17,90 +17,34 @@ import chandu0101.scalajs.react.components.materialui._
 import chandu0101.scalajs.react.components.Implicits._
 import scala.scalajs.js
 
+import components.Login
 import shared.models.SignInData
 
 object HomePage {
 
   case class State(rows: Option[Seq[Table1]] = None,
-                   loginVisible: Boolean = true,
-                   signIn: SignInData = SignInData("", "", false))
+                   loginState: Login.State = Login.State())
 
   class Backend(scope: BackendScope[Unit, State]) {
-
-    val toggleLogin =
-      scope.modState(state => state.copy(loginVisible = !state.loginVisible))
 
     def onEmailChange: ReactEventI => Callback = e => {
       val newValue = e.target.value
       scope.modState(state =>
-            state.copy(signIn = state.signIn.copy(email = newValue)))
+            state.copy(loginState = state.loginState.copy(signIn = state.loginState.signIn.copy(email = newValue))))
     }
 
     def onPasswordChange: ReactEventI => Callback = e => {
       val newValue = e.target.value
       scope.modState(state =>
-            state.copy(signIn = state.signIn.copy(password = newValue)))
+            state.copy(loginState = state.loginState.copy(signIn = state.loginState.signIn.copy(password = newValue))))
     }
 
     def onRememberMe: (ReactEventH, Boolean) => Callback = (e, v) => {
 //      Callback.log(s"remember $v") >>
       scope.modState(
           state =>
-            state.copy(signIn =
-                  state.signIn.copy(rememberMe = v)))
+            state.copy(loginState = state.loginState.copy(signIn = state.loginState.signIn.copy(rememberMe = v))))
     }
-
-    def renderLogin(state: State) = {
-      val actions = js.Array(
-          MuiFlatButton(key = "1",
-                        label = "Login",
-                        secondary = true,
-                        onTouchTap = handleLoginClick)())
-      val component = <.div(
-          css.Home.content,
-          MuiDialog(title = "Login",
-                    actions = actions,
-                    open = state.loginVisible)(
-              <.form(^.onSubmit ==> handleLogin,
-                     MuiTextField(floatingLabelText = "email", 
-                                  value = state.signIn.email,
-                                  onChange = onEmailChange,
-                                  onEnterKeyDown = handleLogin
-                                  )(),
-                     <.br,
-                     MuiTextField(floatingLabelText = "password", 
-                                  `type` = "password",
-                                  value = state.signIn.password,
-                                  onChange = onPasswordChange,
-                                  onEnterKeyDown = handleLogin
-                                  )(),
-                     <.br,
-                     MuiCheckbox(onCheck = onRememberMe)(),
-                     "Remember me")
-          ),
-          "react-quill template")
-      component
-    }
-
-    def doLogin = Callback {
-      val state = scope.state.runNow
-      "/signIn".withData(write(state.signIn)) postAndRun { responseText: String =>
-        val token = read[(String,String)](responseText)._2
-        AjaxUtil.setToken(token)
-        scope.modState(_.copy(loginVisible = false)) >> loadList
-      }
-    }
-
-    def handleLogin: ReactKeyboardEventI => Callback = e => {
-        doLogin >>
-        Callback.log(scope.state.runNow.toString)
-      }
-
-    def handleLoginClick: ReactEventH => Callback =
-      e => {
-        doLogin >>
-        Callback.log(scope.state.runNow.toString)
-      }
 
     def init = Callback {
       if (AjaxUtil.hasToken) loadList.runNow
@@ -115,9 +59,8 @@ object HomePage {
     }
 
     def render(state: State): ReactElement = {
-      if (state.loginVisible) {
-        val component = renderLogin(state)
-        component
+      if (!AjaxUtil.hasToken) {
+        Login()
       } else {
         val component = state.rows match {
           case None =>
@@ -140,7 +83,7 @@ object HomePage {
   }
   
   val component = ReactComponentB[Unit]("HomePage")
-    .initialState(State(loginVisible = !AjaxUtil.hasToken))
+    .initialState(State(loginState = Login.State(visible = !AjaxUtil.hasToken)))
     .renderBackend[Backend]
     .componentDidMount(_.backend.init)
     .componentWillUnmount(_.backend.clear)
@@ -149,4 +92,5 @@ object HomePage {
   def apply(): ReactElement = {
     component()
   }
+  
 }
