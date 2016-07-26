@@ -30,23 +30,24 @@ object HomePage {
     val toggleLogin =
       scope.modState(state => state.copy(loginVisible = !state.loginVisible))
 
-    def onEmailChange(e: ReactEventI) = {
+    def onEmailChange: ReactEventI => Callback = e => {
       val newValue = e.target.value
       scope.modState(state =>
             state.copy(signIn = state.signIn.copy(email = newValue)))
     }
 
-    def onPasswordChange(e: ReactEventI) = {
+    def onPasswordChange: ReactEventI => Callback = e => {
       val newValue = e.target.value
       scope.modState(state =>
             state.copy(signIn = state.signIn.copy(password = newValue)))
     }
 
-    def onRememberMe(e: ReactEventI) = {
+    def onRememberMe: (ReactEventH, Boolean) => Callback = (e, v) => {
+//      Callback.log(s"remember $v") >>
       scope.modState(
           state =>
             state.copy(signIn =
-                  state.signIn.copy(rememberMe = !state.signIn.rememberMe)))
+                  state.signIn.copy(rememberMe = v)))
     }
 
     def renderLogin(state: State) = {
@@ -54,47 +55,58 @@ object HomePage {
           MuiFlatButton(key = "1",
                         label = "Login",
                         secondary = true,
-                        onTouchTap = handleLogin)())
+                        onTouchTap = handleLoginClick)())
       val component = <.div(
           css.Home.content,
           MuiDialog(title = "Login",
                     actions = actions,
                     open = state.loginVisible)(
-              <.form(<.input.text(^.placeholder := "email",
-                                  ^.value := state.signIn.email,
-                                  ^.onChange ==> onEmailChange),
+              <.form(^.onSubmit ==> handleLogin,
+                     MuiTextField(floatingLabelText = "email", 
+                                  value = state.signIn.email,
+                                  onChange = onEmailChange,
+                                  onEnterKeyDown = handleLogin
+                                  )(),
                      <.br,
-                     <.input.password(^.placeholder := "password",
-                                      ^.value := state.signIn.password,
-                                      ^.onChange ==> onPasswordChange),
+                     MuiTextField(floatingLabelText = "password", 
+                                  `type` = "password",
+                                  value = state.signIn.password,
+                                  onChange = onPasswordChange,
+                                  onEnterKeyDown = handleLogin
+                                  )(),
                      <.br,
-                     <.input.checkbox(^.onClick ==> onRememberMe),
+                     MuiCheckbox(onCheck = onRememberMe)(),
                      "Remember me")
           ),
           "react-quill template")
       component
     }
 
-    def doLogin = {
+    def doLogin = Callback {
       val state = scope.state.runNow
       "/signIn".withData(write(state.signIn)) postAndRun { responseText: String =>
         val token = read[(String,String)](responseText)._2
         AjaxUtil.setToken(token)
-        scope.modState(_.copy(loginVisible = false))
+        scope.modState(_.copy(loginVisible = false)) >> loadList
       }
     }
 
-    def handleLogin: ReactEventH => Callback =
+    def handleLogin: ReactKeyboardEventI => Callback = e => {
+        doLogin >>
+        Callback.log(scope.state.runNow.toString)
+      }
+
+    def handleLoginClick: ReactEventH => Callback =
       e => {
-        doLogin
+        doLogin >>
         Callback.log(scope.state.runNow.toString)
       }
 
     def init = Callback {
-      if (AjaxUtil.hasToken) loadList
+      if (AjaxUtil.hasToken) loadList.runNow
     }
     
-    def loadList = {
+    def loadList = Callback {
       "/listTable1" getAndRun { responseText: String =>
         val result = read[Seq[Table1]](responseText)
         //no need to call runNow because it is called by getAndRun
@@ -126,7 +138,7 @@ object HomePage {
     def clear = Callback.log("Clear called")
 
   }
-
+  
   val component = ReactComponentB[Unit]("HomePage")
     .initialState(State(loginVisible = !AjaxUtil.hasToken))
     .renderBackend[Backend]

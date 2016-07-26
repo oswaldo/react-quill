@@ -16,6 +16,7 @@ object MainView {
 
   def scripts(projectName: String)(implicit env: play.Environment) =
     Seq(bundle("index"),
+    		bundle("material_ui"),
         projectScript(projectName, { if (env.isProd) "opt" else "fastopt" }),
 //        projectScript(projectName, "jsdeps"),
         projectScript(projectName, "launcher")
@@ -27,7 +28,6 @@ object MainView {
 //        bundle("react_spinner"),
 //        bundle("react_tags_input"),
 //        bundle("elemental_ui"),
-//        bundle("material_ui")
         )
 
   def projectScript(projectName: String,
