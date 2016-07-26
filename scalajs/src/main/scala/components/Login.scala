@@ -21,7 +21,7 @@ import utils._
 import utils.AjaxUtil._
 
 object Login {
-  
+
   case class State(visible: Boolean = true,
                    signIn: SignInData = SignInData("", "", false))
 
@@ -40,28 +40,27 @@ object Login {
     }
 
     def onRememberMe: (ReactEventH, Boolean) => Callback = (e, v) => {
-      scope.modState(
-          state =>
-            state.copy(signIn =
-                  state.signIn.copy(rememberMe = v)))
+      scope.modState(state =>
+            state.copy(signIn = state.signIn.copy(rememberMe = v)))
     }
 
     def doLogin = Callback {
       val state = scope.state.runNow
-      "/signIn".withData(write(state.signIn)) postAndRun { responseText: String =>
-        val token = read[(String,String)](responseText)._2
-        AjaxUtil.setToken(token)
-        scope.modState(_.copy(visible = false))
+      "/signIn".withData(write(state.signIn)) postAndRun {
+        responseText: String =>
+          val token = read[(String, String)](responseText)._2
+          AjaxUtil.setToken(token)
+          scope.modState(_.copy(visible = false))
       }
     }
 
     def handleLogin: ReactKeyboardEventI => Callback = e => {
-        doLogin
-      }
+      doLogin
+    }
 
     def handleLoginClick: ReactEventH => Callback = e => {
-        doLogin
-      }
+      doLogin
+    }
 
     def render(state: State) = {
       val actions = js.Array(
@@ -71,22 +70,18 @@ object Login {
                         onTouchTap = handleLoginClick)())
       val component = <.div(
           css.Home.content,
-          MuiDialog(title = "Login",
-                    actions = actions,
-                    open = state.visible)(
+          MuiDialog(title = "Login", actions = actions, open = state.visible)(
               <.form(^.onSubmit ==> handleLogin,
-                     MuiTextField(floatingLabelText = "email", 
+                     MuiTextField(floatingLabelText = "email",
                                   value = state.signIn.email,
                                   onChange = onEmailChange,
-                                  onEnterKeyDown = handleLogin
-                                  )(),
+                                  onEnterKeyDown = handleLogin)(),
                      <.br,
-                     MuiTextField(floatingLabelText = "password", 
+                     MuiTextField(floatingLabelText = "password",
                                   `type` = "password",
                                   value = state.signIn.password,
                                   onChange = onPasswordChange,
-                                  onEnterKeyDown = handleLogin
-                                  )(),
+                                  onEnterKeyDown = handleLogin)(),
                      <.br,
                      MuiCheckbox(onCheck = onRememberMe)(),
                      "Remember me")
@@ -96,7 +91,7 @@ object Login {
     }
 
   }
-  
+
   val component = ReactComponentB[Unit]("HomePage")
     .initialState(State(visible = !AjaxUtil.hasToken))
     .renderBackend[Backend]
@@ -105,5 +100,5 @@ object Login {
   def apply(): ReactElement = {
     component()
   }
-  
+
 }

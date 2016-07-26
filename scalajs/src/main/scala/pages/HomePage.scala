@@ -29,27 +29,32 @@ object HomePage {
 
     def onEmailChange: ReactEventI => Callback = e => {
       val newValue = e.target.value
-      scope.modState(state =>
-            state.copy(loginState = state.loginState.copy(signIn = state.loginState.signIn.copy(email = newValue))))
+      scope.modState(
+          state =>
+            state.copy(loginState = state.loginState.copy(
+                    signIn = state.loginState.signIn.copy(email = newValue))))
     }
 
     def onPasswordChange: ReactEventI => Callback = e => {
       val newValue = e.target.value
-      scope.modState(state =>
-            state.copy(loginState = state.loginState.copy(signIn = state.loginState.signIn.copy(password = newValue))))
+      scope.modState(
+          state =>
+            state.copy(loginState = state.loginState.copy(signIn =
+                      state.loginState.signIn.copy(password = newValue))))
     }
 
     def onRememberMe: (ReactEventH, Boolean) => Callback = (e, v) => {
 //      Callback.log(s"remember $v") >>
       scope.modState(
           state =>
-            state.copy(loginState = state.loginState.copy(signIn = state.loginState.signIn.copy(rememberMe = v))))
+            state.copy(loginState = state.loginState.copy(
+                    signIn = state.loginState.signIn.copy(rememberMe = v))))
     }
 
     def init = Callback {
       if (AjaxUtil.hasToken) loadList.runNow
     }
-    
+
     def loadList = Callback {
       "/listTable1" getAndRun { responseText: String =>
         val result = read[Seq[Table1]](responseText)
@@ -70,14 +75,17 @@ object HomePage {
 
           case Some(rows) =>
             //ugly .toString just to prove the concept...
-            <.div(^.id := "home-content",
-                  css.Home.content,
-                  s"${rows.toString}",
-                  <.br,
-                  MuiAvatar(size = 100,
-                      src = "https://pixabay.com/static/uploads/photo/2014/10/22/16/39/tools-498202_960_720.jpg")(),
-                  <.br,
-                  "It Works!")
+            <.div(
+                ^.id := "home-content",
+                css.Home.content,
+                s"${rows.toString}",
+                <.br,
+                MuiAvatar(
+                    size = 100,
+                    src =
+                      "https://pixabay.com/static/uploads/photo/2014/10/22/16/39/tools-498202_960_720.jpg")(),
+                <.br,
+                "It Works!")
         }
         component
       }
@@ -86,9 +94,10 @@ object HomePage {
     def clear = Callback.log("Clear called")
 
   }
-  
+
   val component = ReactComponentB[Unit]("HomePage")
-    .initialState(State(loginState = Login.State(visible = !AjaxUtil.hasToken)))
+    .initialState(
+        State(loginState = Login.State(visible = !AjaxUtil.hasToken)))
     .renderBackend[Backend]
     .componentDidMount(_.backend.init)
     .componentWillUnmount(_.backend.clear)
@@ -97,5 +106,5 @@ object HomePage {
   def apply(): ReactElement = {
     component()
   }
-  
+
 }
