@@ -8,7 +8,8 @@ lazy val playserver = (project in file("play")).settings(
   scalaJSProjects := clients,
   libraryDependencies ++= Seq(
     specs2 % Test,
-    "com.unboundid" % "unboundid-ldapsdk" % "3.1.1"
+    "com.unboundid" % "unboundid-ldapsdk" % "3.1.1",
+    "me.chrons" %% "diode" % "1.0.0"
   ),
   pipelineStages := Seq(webpack),
   webpack <<= webpack dependsOn(JsEngineKeys.npmNodeModules in Assets)
@@ -22,7 +23,8 @@ lazy val scalajsclient = (project in file("scalajs")).settings(
   persistLauncher in Test := false,
   unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value),
   libraryDependencies ++= Seq(
-    "com.github.chandu0101.scalajs-react-components" %%% "core" % "0.4.1"
+    "com.github.chandu0101.scalajs-react-components" %%% "core" % "0.4.1",
+    "me.chrons" %%% "diode" % "1.0.0"
   )
 ).enablePlugins(ScalaJSPlugin, ScalaJSPlay).
   dependsOn(sharedJs)
@@ -57,8 +59,7 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
       "com.mohiva" %% "play-silhouette-crypto-jca" % "4.0.0-RC1",
       "com.mohiva" %% "play-silhouette-testkit" % "4.0.0-RC1" % "test",
       "net.codingwell" %% "scala-guice" % "4.0.1",
-      "com.iheart" %% "ficus" % "1.2.6",
-      "me.chrons" %% "diode" % "1.0.0"
+      "com.iheart" %% "ficus" % "1.2.6"
     )
   ).
   jsSettings(
@@ -71,8 +72,7 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
       "com.github.japgolly.scalajs-react" %%% "ext-monocle" % "0.11.1",
       "com.github.japgolly.scalacss" %%% "core" % "0.4.1",
       "com.github.japgolly.scalacss" %%% "ext-scalatags" % "0.4.1",
-      "com.github.japgolly.scalacss" %%% "ext-react" % "0.4.1",
-      "me.chrons" %%% "diode" % "1.0.0"
+      "com.github.japgolly.scalacss" %%% "ext-react" % "0.4.1"
     ),
     jsDependencies ++= Seq(
     
