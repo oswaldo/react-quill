@@ -72,7 +72,12 @@ object HomePage {
             //ugly .toString just to prove the concept...
             <.div(^.id := "home-content",
                   css.Home.content,
-                  s"${rows.toString}")
+                  s"${rows.toString}",
+                  <.br,
+                  MuiAvatar(size = 100,
+                      src = "https://pixabay.com/static/uploads/photo/2014/10/22/16/39/tools-498202_960_720.jpg")(),
+                  <.br,
+                  "It Works!")
         }
         component
       }

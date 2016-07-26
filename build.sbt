@@ -57,7 +57,8 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
       "com.mohiva" %% "play-silhouette-crypto-jca" % "4.0.0-RC1",
       "com.mohiva" %% "play-silhouette-testkit" % "4.0.0-RC1" % "test",
       "net.codingwell" %% "scala-guice" % "4.0.1",
-      "com.iheart" %% "ficus" % "1.2.6"
+      "com.iheart" %% "ficus" % "1.2.6",
+      "me.chrons" %% "diode" % "1.0.0"
     )
   ).
   jsSettings(
@@ -70,7 +71,8 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
       "com.github.japgolly.scalajs-react" %%% "ext-monocle" % "0.11.1",
       "com.github.japgolly.scalacss" %%% "core" % "0.4.1",
       "com.github.japgolly.scalacss" %%% "ext-scalatags" % "0.4.1",
-      "com.github.japgolly.scalacss" %%% "ext-react" % "0.4.1"
+      "com.github.japgolly.scalacss" %%% "ext-react" % "0.4.1",
+      "me.chrons" %%% "diode" % "1.0.0"
     ),
     jsDependencies ++= Seq(
     
