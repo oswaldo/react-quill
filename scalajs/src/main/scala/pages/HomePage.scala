@@ -20,7 +20,9 @@ import scala.scalajs.js
 import components.Login
 import components.SPAProps
 import shared.models.SignInData
-import diode.react.ModelProxy
+import diode._
+import diode.react._
+import circuit.SPACircuit
 
 object HomePage {
 
@@ -48,7 +50,7 @@ object HomePage {
     }
 
     def onRememberMe: (ReactEventH, Boolean) => Callback = (e, v) => {
-//      Callback.log(s"remember $v") >>
+      //      Callback.log(s"remember $v") >>
       scope.modState(
           state =>
             state.copy(loginState = state.loginState.copy(
@@ -66,6 +68,10 @@ object HomePage {
         scope.modState(_.copy(rows = Some(result)))
       }
     }
+
+    val unsubscribe = SPACircuit.subscribe(SPACircuit.zoom(_.token))(c => {
+      loadList.runNow
+    })
 
     def render(props: SPAProps, state: State): ReactElement = {
       if (!AjaxUtil.hasToken) {
@@ -108,8 +114,8 @@ object HomePage {
     .componentWillUnmount(_.backend.clear)
     .build
 
-  def apply(tokenProxy: ModelProxy[Option[String]]): ReactElement = {
-    component(SPAProps(tokenProxy))
+  def apply(props: SPAProps): ReactElement = {
+    component(props)
   }
 
 }

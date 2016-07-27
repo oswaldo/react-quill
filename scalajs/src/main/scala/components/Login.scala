@@ -20,7 +20,8 @@ import shared.models.SignInData
 import utils._
 import utils.AjaxUtil._
 
-import diode.Action
+import diode._
+import diode.Action.aType
 import models.SPAModel
 
 object Login {
@@ -54,8 +55,9 @@ object Login {
         responseText: String =>
           val token = read[(String, String)](responseText)._2
           AjaxUtil.setToken(token)
-          scope.modState(_.copy(visible = false)) >> props.tokenProxy
-            .theDispatch(SPAModel.SetToken(token))
+          scope.modState(_.copy(visible = false)) >> Callback {
+            props.dispatch(SPAModel.SetToken(token))
+          }
       }
     }
 
@@ -70,7 +72,6 @@ object Login {
     }
 
     def render(props: SPAProps, state: State) = {
-      val dispatch: Action => Callback = props.tokenProxy.theDispatch
       val actions = js.Array(
           MuiFlatButton(key = "1",
                         label = "Login",
@@ -93,8 +94,7 @@ object Login {
                                onEnterKeyDown = handleLogin(props, state))(),
                   <.br,
                   MuiCheckbox(onCheck = onRememberMe)(),
-                  "Remember me")
-          ),
+                  "Remember me")),
           "react-quill template")
       component
     }

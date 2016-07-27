@@ -9,6 +9,7 @@ import pages.HomePage
 import japgolly.scalajs.react.ReactComponentU
 
 import circuit.SPACircuit
+import components.SPAProps
 
 object AppRouter {
 
@@ -26,8 +27,9 @@ object AppRouter {
         case Items(p) => p
       }
     (trimSlashes
-          | staticRoute(root, Home) ~> renderR(
-              router => tokenConnection(p => HomePage(p)))
+          | staticRoute(root, Home) ~> renderR(router =>
+                tokenConnection(p =>
+                      HomePage(SPAProps(p.modelReader, SPACircuit))))
           | itemRoutes)
       .notFound(redirectToPage(Home)(Redirect.Replace))
       .renderWith(layout _)
@@ -48,5 +50,6 @@ object AppRouter {
 
   val baseUrl = BaseUrl.fromWindowOrigin / "react-scalajs-scalatags/"
 
-  val router: ReactComponentU[Unit, _, Any, _] = Router(baseUrl, config)()
+  val router: ReactComponentU[Unit, _, Any, _] =
+    Router(baseUrl, config.logToConsole)()
 }

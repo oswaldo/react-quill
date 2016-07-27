@@ -18,6 +18,8 @@ object Hello extends JSApp {
 
   def main(): Unit = {
     AppCSS.load
+    Hooks.hookPersistState("test", SPACircuit)
+    SPACircuit.dispatch(SPAModel.ClearToken)
     ReactDOM.render(AppRouter.router, dom.document.getElementById("viewport"))
   }
 
