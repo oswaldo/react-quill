@@ -31,10 +31,12 @@ class Application @Inject()(silhouette: Silhouette[DefaultEnv],
 
   def index = ok()
 
-  def ok(view: Seq[Text.TypedTag[String]] = Seq.empty) = Action {
-    implicit val codec = Codec.utf_8
-    Ok(MainView(view).toString).withHeaders(CONTENT_TYPE -> ContentTypes.HTML)
-  }
+  def ok(view: Seq[Text.TypedTag[String]] = Seq { div(id := "viewport") }) =
+    Action {
+      implicit val codec = Codec.utf_8
+      Ok(MainView(view).toString)
+        .withHeaders(CONTENT_TYPE -> ContentTypes.HTML)
+    }
 
   /**
     * Returns the user.

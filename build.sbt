@@ -9,7 +9,8 @@ lazy val playserver = (project in file("play")).settings(
   libraryDependencies ++= Seq(
     specs2 % Test,
     "com.unboundid" % "unboundid-ldapsdk" % "3.1.1",
-    "me.chrons" %% "diode" % "1.0.0"
+    "me.chrons" %% "diode" % "1.0.0",
+    "me.chrons" %% "diode-devtools" % "1.0.0"
   ),
   pipelineStages := Seq(webpack),
   webpack <<= webpack dependsOn(JsEngineKeys.npmNodeModules in Assets)
@@ -24,7 +25,9 @@ lazy val scalajsclient = (project in file("scalajs")).settings(
   unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value),
   libraryDependencies ++= Seq(
     "com.github.chandu0101.scalajs-react-components" %%% "core" % "0.4.1",
-    "me.chrons" %%% "diode" % "1.0.0"
+    "me.chrons" %%% "diode" % "1.0.0",
+    "me.chrons" %%% "diode-react" % "1.0.0",
+    "me.chrons" %%% "diode-devtools" % "1.0.0"
   )
 ).enablePlugins(ScalaJSPlugin, ScalaJSPlay).
   dependsOn(sharedJs)

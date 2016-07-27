@@ -1,17 +1,24 @@
-import scala.scalajs.js
+import scala.scalajs.js.JSApp
+import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.Dynamic.global
 import org.scalajs.dom
 import scalatags.JsDom.all._
 import shared.SharedMessages
 import css.AppCSS
 import routes.AppRouter
+import circuit.SPACircuit
+import models.SPAModel
+import diode.dev.{Hooks, PersistStateIDB}
+import upickle.default._
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.router._
 
-object Hello extends js.JSApp {
+@JSExport("Hello")
+object Hello extends JSApp {
 
   def main(): Unit = {
     AppCSS.load
-    AppRouter.router().render(dom.document.body)
-
+    ReactDOM.render(AppRouter.router, dom.document.getElementById("viewport"))
   }
 
 }

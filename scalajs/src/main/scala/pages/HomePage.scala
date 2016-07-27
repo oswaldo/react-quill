@@ -18,14 +18,18 @@ import chandu0101.scalajs.react.components.Implicits._
 import scala.scalajs.js
 
 import components.Login
+import components.SPAProps
 import shared.models.SignInData
+import diode.react.ModelProxy
 
 object HomePage {
 
   case class State(rows: Option[Seq[Table1]] = None,
                    loginState: Login.State = Login.State())
 
-  class Backend(scope: BackendScope[Unit, State]) {
+  class Backend(scope: BackendScope[SPAProps, State]) {
+
+    def mounted(props: SPAProps) = Callback {}
 
     def onEmailChange: ReactEventI => Callback = e => {
       val newValue = e.target.value
@@ -63,9 +67,9 @@ object HomePage {
       }
     }
 
-    def render(state: State): ReactElement = {
+    def render(props: SPAProps, state: State): ReactElement = {
       if (!AjaxUtil.hasToken) {
-        Login()
+        Login(props)
       } else {
         val component = state.rows match {
           case None =>
@@ -95,16 +99,17 @@ object HomePage {
 
   }
 
-  val component = ReactComponentB[Unit]("HomePage")
+  private val component = ReactComponentB[SPAProps]("HomePage")
     .initialState(
         State(loginState = Login.State(visible = !AjaxUtil.hasToken)))
     .renderBackend[Backend]
-    .componentDidMount(_.backend.init)
+    .componentDidMount(scope =>
+          scope.backend.mounted(scope.props) >> scope.backend.init)
     .componentWillUnmount(_.backend.clear)
     .build
 
-  def apply(): ReactElement = {
-    component()
+  def apply(tokenProxy: ModelProxy[Option[String]]): ReactElement = {
+    component(SPAProps(tokenProxy))
   }
 
 }

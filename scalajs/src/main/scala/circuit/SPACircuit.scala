@@ -1,9 +1,10 @@
 package circuit
 
 import diode._
+import diode.react._
 import models.SPAModel
 
-object SPACircuit extends Circuit[SPAModel] {
+object SPACircuit extends Circuit[SPAModel] with ReactConnector[SPAModel] {
 
   def initialModel = SPAModel()
 

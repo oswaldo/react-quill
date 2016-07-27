@@ -6,6 +6,9 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import components.{TopNav, Footer}
 import models.Menu
 import pages.HomePage
+import japgolly.scalajs.react.ReactComponentU
+
+import circuit.SPACircuit
 
 object AppRouter {
 
@@ -14,6 +17,8 @@ object AppRouter {
   case object Home extends AppPage
   case class Items(p: Item) extends AppPage
 
+  val tokenConnection = SPACircuit.connect(_.token)
+
   val config = RouterConfigDsl[AppPage].buildConfig { dsl =>
     import dsl._
     val itemRoutes: Rule =
@@ -21,10 +26,11 @@ object AppRouter {
         case Items(p) => p
       }
     (trimSlashes
-          | staticRoute(root, Home) ~> render(HomePage())
+          | staticRoute(root, Home) ~> renderR(
+              router => tokenConnection(p => HomePage(p)))
           | itemRoutes)
       .notFound(redirectToPage(Home)(Redirect.Replace))
-      .renderWith(layout)
+      .renderWith(layout _)
   }
 
   val mainMenu = Vector(
@@ -42,5 +48,5 @@ object AppRouter {
 
   val baseUrl = BaseUrl.fromWindowOrigin / "react-scalajs-scalatags/"
 
-  val router = Router(baseUrl, config)
+  val router: ReactComponentU[Unit, _, Any, _] = Router(baseUrl, config)()
 }
